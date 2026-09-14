@@ -1,0 +1,12 @@
+amends "pkl:Project"
+
+package {
+  name = "pkl-spire"
+  license = "MIT"
+  version = "0.1.0"
+  baseUri = "package://github.com/faisal-memon/pkl-spire/releases/download/v\(version)/pkl-spire"
+  packageZipUrl = "https://github.com/faisal-memon/pkl-spire/releases/download/v\(version)/pkl-spire@\(version).zip"
+  sourceCode = "https://github.com/faisal-memon/pkl-spire"
+  sourceCodeUrlScheme = "\(sourceCode)/blob/v\(version)%{path}#L%{line}"
+  exclude { "out/**"; "dist/**"; "tests/**"; "Makefile"; "**/__pycache__/**" }
+}

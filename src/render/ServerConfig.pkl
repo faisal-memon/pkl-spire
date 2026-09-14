@@ -1,0 +1,27 @@
+/// Map typed server settings into SPIRE JSON.
+open module spire.render.ServerConfig
+
+import "../core/Server.pkl"
+
+settings: Server
+
+output {
+  value = new Dynamic {
+    server {
+      bind_address = "0.0.0.0"
+      bind_port = settings.port
+      trust_domain = settings.trustDomain
+      data_dir = settings.dataDir
+      socket_path = settings.socketPath
+      log_level = settings.logLevel
+    }
+    plugins {
+      DataStore {
+        sql { plugin_data { database_type = "sqlite3"; connection_string = settings.dataDir + "/datastore.sqlite3" } }
+      }
+      KeyManager { disk { plugin_data { keys_path = settings.dataDir + "/keys.json" } } }
+      NodeAttestor { join_token { plugin_data = new Dynamic {} } }
+    }
+  }
+  renderer = new JsonRenderer {}
+}

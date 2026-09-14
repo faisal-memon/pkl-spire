@@ -1,0 +1,13 @@
+/// Typed agent settings; no output mapping.
+open module spire.core.Agent
+
+import "Common.pkl"
+
+trustDomain: Common.TrustDomain
+serverAddress: String(!isEmpty, !contains("\n"), !contains("$"))
+serverPort: Common.Port = 8081
+dataDir: Common.AbsolutePath = "/opt/spire/data/agent"
+socketPath: Common.AbsolutePath = "/opt/spire/sockets/agent/api.sock"
+trustBundlePath: Common.AbsolutePath = "/opt/spire/bootstrap/bundle.pem"
+joinTokenFile: Common.AbsolutePath = "/opt/spire/bootstrap/join-token"
+logLevel: Common.LogLevel = "INFO"

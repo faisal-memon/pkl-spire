@@ -1,0 +1,71 @@
+/// Separate Compose files for a server host and each agent host.
+open module spire.compose.Deployment
+
+import "../core/Common.pkl"
+import "../core/Server.pkl"
+import "../core/Agent.pkl"
+import "../render/ServerConfig.pkl"
+import "../render/AgentConfig.pkl"
+
+trustDomain: Common.TrustDomain
+serverAddress: String(!isEmpty, !contains("\n"), !contains("$"))
+spireVersion: String(matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+")))
+serverPort: Common.Port = 8081
+hostRoot: Common.AbsolutePath = "/var/lib/spire"
+
+hidden serverSettings: Server = new {
+  trustDomain = outer.trustDomain
+  port = serverPort
+}
+hidden agentSettings: Agent = new {
+  trustDomain = outer.trustDomain
+  serverAddress = outer.serverAddress
+  serverPort = outer.serverPort
+}
+
+hidden serverCompose = new Dynamic {
+  name = "spire-server"
+  services {
+    server {
+      image = "ghcr.io/spiffe/spire-server:\(spireVersion)"
+      command = new Listing { "-config"; "/opt/spire/conf/server.conf" }
+      restart = "unless-stopped"
+      volumes = new Listing {
+        new Dynamic { type = "bind"; source = hostRoot + "/server"; target = serverSettings.dataDir; bind { create_host_path = false } }
+        new Dynamic { type = "bind"; source = "./server.conf"; target = "/opt/spire/conf/server.conf"; read_only = true; bind { create_host_path = false } }
+      }
+      ports = new Listing {
+        new Dynamic { target = serverPort; published = serverPort; protocol = "tcp" }
+      }
+    }
+  }
+}
+
+hidden agentCompose = new Dynamic {
+  name = "spire-agent"
+  services {
+    agent {
+      image = "ghcr.io/spiffe/spire-agent:\(spireVersion)"
+      command = new Listing { "-config"; "/opt/spire/conf/agent.conf" }
+      user = "0:0"
+      pid = "host"
+      restart = "unless-stopped"
+      volumes = new Listing {
+        new Dynamic { type = "bind"; source = "./agent.conf"; target = "/opt/spire/conf/agent.conf"; read_only = true; bind { create_host_path = false } }
+        new Dynamic { type = "bind"; source = hostRoot + "/agent"; target = agentSettings.dataDir; bind { create_host_path = false } }
+        new Dynamic { type = "bind"; source = hostRoot + "/sockets"; target = "/opt/spire/sockets/agent"; bind { create_host_path = false } }
+        new Dynamic { type = "bind"; source = hostRoot + "/bootstrap"; target = "/opt/spire/bootstrap"; read_only = true; bind { create_host_path = false } }
+        new Dynamic { type = "bind"; source = "/var/run/docker.sock"; target = "/var/run/docker.sock"; read_only = true; bind { create_host_path = false } }
+      }
+    }
+  }
+}
+
+output {
+  files {
+    ["server.conf"] { text = new ServerConfig { settings = serverSettings }.output.text }
+    ["agent.conf"] { text = new AgentConfig { settings = agentSettings }.output.text }
+    ["server.compose.yaml"] { value = serverCompose; renderer = new YamlRenderer {} }
+    ["agent.compose.yaml"] { value = agentCompose; renderer = new YamlRenderer {} }
+  }
+}

@@ -1,0 +1,10 @@
+/// Typed server settings; no output mapping.
+open module spire.core.Server
+
+import "Common.pkl"
+
+trustDomain: Common.TrustDomain
+port: Common.Port = 8081
+dataDir: Common.AbsolutePath = "/var/lib/spire/server"
+socketPath: Common.AbsolutePath = "/tmp/spire-server/private/api.sock"
+logLevel: Common.LogLevel = "INFO"

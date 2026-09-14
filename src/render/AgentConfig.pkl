@@ -1,0 +1,27 @@
+/// Map typed agent settings into SPIRE JSON.
+open module spire.render.AgentConfig
+
+import "../core/Agent.pkl"
+
+settings: Agent
+
+output {
+  value = new Dynamic {
+    agent {
+      trust_domain = settings.trustDomain
+      server_address = settings.serverAddress
+      server_port = settings.serverPort
+      data_dir = settings.dataDir
+      socket_path = settings.socketPath
+      trust_bundle_path = settings.trustBundlePath
+      join_token_file = settings.joinTokenFile
+      log_level = settings.logLevel
+    }
+    plugins {
+      KeyManager { disk { plugin_data { directory = settings.dataDir } } }
+      NodeAttestor { join_token { plugin_data = new Dynamic {} } }
+      WorkloadAttestor { docker { plugin_data = new Dynamic {} } }
+    }
+  }
+  renderer = new JsonRenderer {}
+}

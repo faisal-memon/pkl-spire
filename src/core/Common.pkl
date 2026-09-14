@@ -1,0 +1,7 @@
+/// Shared validation types.
+module spire.core.Common
+
+typealias TrustDomain = String(matches(Regex("[a-z0-9]+([.-][a-z0-9]+)*")), length <= 255)
+typealias AbsolutePath = String(startsWith("/"), !contains("\n"), !contains("$"))
+typealias Port = Int(isBetween(1, 65535))
+typealias LogLevel = "DEBUG"|"INFO"|"WARN"|"ERROR"
