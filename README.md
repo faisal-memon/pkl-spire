@@ -94,8 +94,18 @@ To render only a server configuration, amend `src/render/ServerConfig.pkl` in a 
 - [SPIRE image entrypoints and ownership](https://github.com/spiffe/spire/blob/v1.15.3/Dockerfile)
 - [Docker attestor](https://github.com/spiffe/spire/blob/v1.15.3/doc/plugin_agent_workloadattestor_docker.md)
 
-## Building release artifacts
+## Releases
 
-Run `make validate` first, then `make package`. Upload all four files from `dist/` to the GitHub release matching the version in `PklProject` (for example `v0.1.0`). Never overwrite an existing version with different contents. The archive contains reusable source, examples, and documentation; deployment output and tests are excluded.
+PRs run the generation tests, Compose validation, and package construction. Merges to `main` publish a release using `faisal-memon/pr-label-semver@v0`:
+
+- `semver:major`: breaking configuration API changes.
+- `semver:minor`: new backward-compatible capabilities.
+- `semver:patch`: fixes; also the default when no version label is present.
+
+The action calculates the next tag without writing it. Packaging injects that version through the `PKL_PACKAGE_VERSION` environment variable, so metadata, package URI, source links, and ZIP URL agree. Only successful validation and packaging proceed to tag/release creation. Assets upload into a draft release before publication. Release runs are serialized. A failed upload/publication may leave a draft release; recover that release instead of deleting or overwriting published package versions. A manual run from `main` can select a bump explicitly.
+
+`PklProject` defaults to 0.1.0 for local development. To build another version locally, run `make package VERSION=0.2.0`. Do not edit the manifest version for each release or overwrite published versions. Consumer repositories keep exact versions and checksum lockfiles until deliberately upgraded.
+
+Pkl is pinned to 0.32.1 in CI and its downloaded binary is checked against the release asset's SHA-256 digest. The setup action targets Linux amd64 runners.
 
 Licensed under MIT; see LICENSE.

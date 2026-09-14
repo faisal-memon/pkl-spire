@@ -1,0 +1,52 @@
+name: Publish Pkl package
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: Version segment to increment
+        type: choice
+        default: patch
+        options: [patch, minor, major]
+permissions:
+  contents: write
+  pull-requests: read
+concurrency:
+  group: release-${{ github.repository }}
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-pkl
+      - run: make validate
+      - name: Calculate version from PR labels
+        id: version
+        uses: faisal-memon/pr-label-semver@v0
+        with:
+          github-token: ${{ github.token }}
+          version-bump: ${{ github.event_name == 'workflow_dispatch' && inputs.version_bump || '' }}
+          write-tag: "false"
+          write-major-tag: "false"
+      - name: Build versioned package
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.new-tag }}
+        run: make package VERSION="${RELEASE_TAG#v}"
+      - name: Publish release after successful packaging
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ steps.version.outputs.new-tag }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          artifact="dist/pkl-spire@${RELEASE_TAG#v}"
+          gh release create "$RELEASE_TAG" \
+            "$artifact" "$artifact.sha256" "$artifact.zip" "$artifact.zip.sha256" \
+            --target "$RELEASE_COMMIT" --title "$RELEASE_TAG" --generate-notes --draft
+          gh release edit "$RELEASE_TAG" --draft=false
