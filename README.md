@@ -57,6 +57,8 @@ hostRoot = "/var/lib/spire"
 
 Then run `pkl eval -m out /path/to/consumer.pkl`. Example names and addresses are placeholders. This repository must not contain private environment values, credentials, or generated bootstrap tokens.
 
+The high-level deployment module defaults to the example trust domain `example.org` so first-time users can render the example without extra configuration. Production deployments should always override it with their own trust domain.
+
 ## Networking and host access
 
 The server and agents communicate over the existing LAN using the configured server address and TCP port (8081 by default). No shared cross-host Docker network or orchestrator is required. Each workload mounts its local agent's Workload API socket. SPIRE bootstrap establishes trust in the server; network reachability alone does not establish trust.
