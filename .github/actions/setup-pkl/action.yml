@@ -1,0 +1,15 @@
+name: Set up Pkl
+description: Install the checksum-verified Pkl 0.32.1 Linux amd64 executable.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        set -euo pipefail
+        mkdir -p "$RUNNER_TEMP/pkl-bin"
+        curl --fail --location --retry 3 \
+          https://github.com/apple/pkl/releases/download/0.32.1/pkl-linux-amd64 \
+          --output "$RUNNER_TEMP/pkl-bin/pkl"
+        echo "3180b62da95c0cad1d904e9bb6c5f4a8f9032413c21e53194bb91ff1ee5f3211  $RUNNER_TEMP/pkl-bin/pkl" | sha256sum --check
+        chmod +x "$RUNNER_TEMP/pkl-bin/pkl"
+        echo "$RUNNER_TEMP/pkl-bin" >> "$GITHUB_PATH"

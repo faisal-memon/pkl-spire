@@ -87,3 +87,16 @@ class GenerationTests(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stderr)
                 config = json.loads(result.stdout)
                 self.assertEqual(config[role.lower()]['trust_domain'], 'independent.example')
+
+    def test_release_version_matches_metadata_and_urls(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            env = dict(os.environ, PKL_PACKAGE_VERSION='0.2.7')
+            result = subprocess.run([PKL, 'project', 'package', str(ROOT),
+                                     '--skip-publish-check', '--output-path', temporary],
+                                    env=env, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            metadata = json.loads((Path(temporary) / 'pkl-spire@0.2.7').read_text())
+            self.assertEqual(metadata['version'], '0.2.7')
+            self.assertTrue(metadata['packageUri'].endswith('/v0.2.7/pkl-spire@0.2.7'))
+            self.assertTrue(metadata['packageZipUrl'].endswith('/v0.2.7/pkl-spire@0.2.7.zip'))
+            self.assertEqual(len(list(Path(temporary).iterdir())), 4)

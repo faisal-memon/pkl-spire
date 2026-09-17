@@ -15,6 +15,13 @@ output {
       socket_path = settings.socketPath
       log_level = settings.logLevel
     }
+    health_checks {
+      listener_enabled = settings.healthChecksEnabled
+      bind_address = settings.healthBindAddress
+      bind_port = settings.healthPort
+      live_path = settings.livePath
+      ready_path = settings.readyPath
+    }
     plugins {
       DataStore {
         sql { plugin_data { database_type = "sqlite3"; connection_string = settings.dataDir + "/datastore.sqlite3" } }

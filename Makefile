@@ -2,6 +2,7 @@ PKL ?= pkl
 DOCKER ?= docker
 CONFIG ?= examples/compose.pkl
 OUT ?= out
+VERSION ?= 0.1.0
 
 .PHONY: render test validate
 render:
@@ -16,4 +17,4 @@ validate: render test
 
 .PHONY: package
 package:
-	$(PKL) project package --output-path dist
+	PKL_PACKAGE_VERSION="$(VERSION)" $(PKL) project package --output-path dist

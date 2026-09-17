@@ -16,6 +16,8 @@ hostRoot: Common.AbsolutePath = "/var/lib/spire"
 hidden serverSettings: Server = new {
   trustDomain = outer.trustDomain
   port = serverPort
+  healthChecksEnabled = true
+  healthBindAddress = "0.0.0.0"
 }
 hidden agentSettings: Agent = new {
   trustDomain = outer.trustDomain
@@ -36,6 +38,7 @@ hidden serverCompose = new Dynamic {
       }
       ports = new Listing {
         new Dynamic { target = serverPort; published = serverPort; protocol = "tcp" }
+        new Dynamic { target = serverSettings.healthPort; published = "127.0.0.1:\(serverSettings.healthPort):\(serverSettings.healthPort)"; protocol = "tcp" }
       }
     }
   }
