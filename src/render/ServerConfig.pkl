@@ -28,6 +28,7 @@ output {
       }
       KeyManager { disk { plugin_data { keys_path = settings.dataDir + "/keys.json" } } }
       NodeAttestor { join_token { plugin_data = new Dynamic {} } }
+      BundlePublisher = if (settings.bundlePublisherCommand != null) new Dynamic { disk { plugin_cmd = settings.bundlePublisherCommand; plugin_checksum = settings.bundlePublisherChecksum; plugin_data { directory = settings.bundlePublisherDirectory; format = "pem"; filename = "bundle.pem" } } } else null
     }
   }
   renderer = new JsonRenderer {}

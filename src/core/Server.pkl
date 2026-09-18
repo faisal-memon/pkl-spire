@@ -3,6 +3,11 @@ open module spire.core.Server
 
 import "Common.pkl"
 
+/// Optional custom BundlePublisher executable mounted into the SPIRE server.
+bundlePublisherCommand: String? = null
+bundlePublisherChecksum: String? = null
+bundlePublisherDirectory: Common.AbsolutePath = "/var/lib/spire/bundles"
+
 trustDomain: Common.TrustDomain
 port: Common.Port = 8081
 healthChecksEnabled: Boolean = true
