@@ -7,6 +7,8 @@ import "Common.pkl"
 bundlePublisherCommand: String? = null
 bundlePublisherChecksum: String? = null
 bundlePublisherDirectory: Common.AbsolutePath = "/var/lib/spire/bundles"
+bundlePublisherDownloadUrl: String? = null
+bundlePublisherDownloadChecksum: String? = null
 
 trustDomain: Common.TrustDomain
 port: Common.Port = 8081
