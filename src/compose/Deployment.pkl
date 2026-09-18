@@ -39,7 +39,7 @@ hidden serverCompose = new Dynamic {
       }
       ports = new Listing {
         new Dynamic { target = serverPort; published = serverPort; protocol = "tcp" }
-        new Dynamic { target = serverSettings.healthPort; published = "127.0.0.1:\(serverSettings.healthPort):\(serverSettings.healthPort)"; protocol = "tcp" }
+        new Dynamic { target = serverSettings.healthPort; published = serverSettings.healthPort; host_ip = "127.0.0.1"; protocol = "tcp" }
       }
     }
   }
