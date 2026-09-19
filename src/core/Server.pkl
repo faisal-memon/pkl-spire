@@ -15,10 +15,10 @@ socketPath: Common.AbsolutePath = "/tmp/spire-server/private/api.sock"
 logLevel: Common.LogLevel = "INFO"
 
 /// Optional custom BundlePublisher loaded by the SPIRE server.
-customBundlePublisher: CustomBundlePublisher? = null
+diskBundlePublisher: DiskBundlePublisher? = null
 
 /// Configuration for an externally built SPIRE BundlePublisher plugin.
-class CustomBundlePublisher {
+class DiskBundlePublisher {
   command: String(!isEmpty, !contains("\n"), !contains("$"))
   checksum: String? = null
   directory: Common.AbsolutePath = "/var/lib/spire/bundles"

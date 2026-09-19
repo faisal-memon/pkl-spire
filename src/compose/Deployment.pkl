@@ -13,24 +13,24 @@ serverAddress: String(!isEmpty, !contains("\n"), !contains("$"))
 spireVersion: String(matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+")))
 serverPort: Common.Port = 8081
 hostRoot: Common.AbsolutePath = "/var/lib/spire"
-customBundlePublisher: Server.CustomBundlePublisher? = null
+diskBundlePublisher: Server.DiskBundlePublisher? = null
 
 hidden serverSettings: Server = new {
   trustDomain = outer.trustDomain
   port = serverPort
   healthChecksEnabled = true
   healthBindAddress = "0.0.0.0"
-  customBundlePublisher = outer.customBundlePublisher
+  diskBundlePublisher = outer.diskBundlePublisher
 }
 hidden pluginPath: String = "/plugin/publisher"
-hidden pluginDownloadCommand: String = if (serverSettings.customBundlePublisher != null)
+hidden pluginDownloadCommand: String = if (serverSettings.diskBundlePublisher != null)
   "curl -fsSL --retry 5 --retry-all-errors"
-  + " \"\(serverSettings.customBundlePublisher.downloadUrl)\""
+  + " \"\(serverSettings.diskBundlePublisher.downloadUrl)\""
   + " -o \"\(pluginPath)\""
 else
   ""
-hidden pluginChecksumCommand: String = if (serverSettings.customBundlePublisher != null && serverSettings.customBundlePublisher.downloadChecksum != null)
-  "echo \"\(serverSettings.customBundlePublisher.downloadChecksum)  \(pluginPath)\" | sha256sum -c -"
+hidden pluginChecksumCommand: String = if (serverSettings.diskBundlePublisher != null && serverSettings.diskBundlePublisher.downloadChecksum != null)
+  "echo \"\(serverSettings.diskBundlePublisher.downloadChecksum)  \(pluginPath)\" | sha256sum -c -"
 else
   "true"
 hidden pluginCleanupCommand: String = "rm -f \"\(pluginPath)\""
@@ -47,7 +47,7 @@ hidden agentSettings: Agent = new {
 hidden serverCompose = new Dynamic {
   name = "spire-server"
   services {
-    plugin_init = if (serverSettings.customBundlePublisher != null) new Dynamic {
+    plugin_init = if (serverSettings.diskBundlePublisher != null) new Dynamic {
       image = "curlimages/curl:8.10.1"
       user = "0:0"
       restart = "no"
@@ -61,12 +61,12 @@ hidden serverCompose = new Dynamic {
       image = "ghcr.io/spiffe/spire-server:\(spireVersion)"
       command = new Listing { "-config"; "/opt/spire/conf/server.conf" }
       restart = "unless-stopped"
-      depends_on = if (serverSettings.customBundlePublisher != null) new Dynamic {
+      depends_on = if (serverSettings.diskBundlePublisher != null) new Dynamic {
         plugin_init { condition = "service_completed_successfully" }
       } else null
-      volumes = if (serverSettings.customBundlePublisher?.hostDirectory != null) new Listing {
+      volumes = if (serverSettings.diskBundlePublisher?.hostDirectory != null) new Listing {
         new Dynamic { type = "bind"; source = hostRoot + "/server"; target = serverSettings.dataDir; bind { create_host_path = false } }
-        new Dynamic { type = "bind"; source = serverSettings.customBundlePublisher.hostDirectory; target = serverSettings.customBundlePublisher.directory; bind { create_host_path = false } }
+        new Dynamic { type = "bind"; source = serverSettings.diskBundlePublisher.hostDirectory; target = serverSettings.diskBundlePublisher.directory; bind { create_host_path = false } }
         new Dynamic { type = "bind"; source = "./server.conf"; target = "/opt/spire/conf/server.conf"; read_only = true; bind { create_host_path = false } }
         new Dynamic { type = "volume"; source = "spire-plugin"; target = "/opt/spire/plugins"; read_only = true }
       } else new Listing {
