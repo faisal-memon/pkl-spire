@@ -22,6 +22,7 @@ class CustomBundlePublisher {
   command: String(!isEmpty, !contains("\n"), !contains("$"))
   checksum: String? = null
   directory: Common.AbsolutePath = "/var/lib/spire/bundles"
+  hostDirectory: Common.AbsolutePath? = null
   downloadUrl: String(!isEmpty, !contains("\n"), !contains("$"))
   downloadChecksum: String? = null
 }
