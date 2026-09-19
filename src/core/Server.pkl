@@ -3,6 +3,17 @@ open module spire.core.Server
 
 import "Common.pkl"
 
+trustDomain: Common.TrustDomain
+port: Common.Port = 8081
+healthChecksEnabled: Boolean = true
+healthBindAddress: String(!isEmpty, !contains("\n"), !contains("$")) = "127.0.0.1"
+healthPort: Common.Port = 8080
+livePath: String(!isEmpty, !contains("\n"), !contains("$")) = "/live"
+readyPath: String(!isEmpty, !contains("\n"), !contains("$")) = "/ready"
+dataDir: Common.AbsolutePath = "/var/lib/spire/server"
+socketPath: Common.AbsolutePath = "/tmp/spire-server/private/api.sock"
+logLevel: Common.LogLevel = "INFO"
+
 /// Configuration for an externally built SPIRE BundlePublisher plugin.
 class CustomBundlePublisher {
   command: String(!isEmpty, !contains("\n"), !contains("$"))
@@ -14,14 +25,3 @@ class CustomBundlePublisher {
 
 /// Optional custom BundlePublisher loaded by the SPIRE server.
 customBundlePublisher: CustomBundlePublisher? = null
-
-trustDomain: Common.TrustDomain
-port: Common.Port = 8081
-healthChecksEnabled: Boolean = true
-healthBindAddress: String(!isEmpty, !contains("\n"), !contains("$")) = "127.0.0.1"
-healthPort: Common.Port = 8080
-livePath: String(!isEmpty, !contains("\n"), !contains("$")) = "/live"
-readyPath: String(!isEmpty, !contains("\n"), !contains("$")) = "/ready"
-dataDir: Common.AbsolutePath = "/var/lib/spire/server"
-socketPath: Common.AbsolutePath = "/tmp/spire-server/private/api.sock"
-logLevel: Common.LogLevel = "INFO"
