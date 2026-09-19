@@ -20,12 +20,20 @@ hidden serverSettings: Server = new {
   healthChecksEnabled = true
   healthBindAddress = "0.0.0.0"
 }
-hidden pluginDownloadCommand: String = if (serverSettings.customBundlePublisher != null && serverSettings.customBundlePublisher.downloadChecksum != null)
-  "curl -fsSL --retry 5 --retry-all-errors \"\(serverSettings.customBundlePublisher.downloadUrl)\" -o /plugin/publisher && echo \"\(serverSettings.customBundlePublisher.downloadChecksum)  /plugin/publisher\" | sha256sum -c - && chmod 0555 /plugin/publisher"
-else if (serverSettings.customBundlePublisher != null)
-  "curl -fsSL --retry 5 --retry-all-errors \"\(serverSettings.customBundlePublisher.downloadUrl)\" -o /plugin/publisher && chmod 0555 /plugin/publisher"
+hidden pluginPath: String = "/plugin/publisher"
+hidden pluginDownloadCommand: String = if (serverSettings.customBundlePublisher != null)
+  "curl -fsSL --retry 5 --retry-all-errors"
+  + " \"\(serverSettings.customBundlePublisher.downloadUrl)\""
+  + " -o \"\(pluginPath)\""
 else
   ""
+hidden pluginChecksumCommand: String = if (serverSettings.customBundlePublisher != null && serverSettings.customBundlePublisher.downloadChecksum != null)
+  "echo \"\(serverSettings.customBundlePublisher.downloadChecksum)  \(pluginPath)\" | sha256sum -c -"
+else
+  "true"
+hidden pluginPrepareCommand: String = "chmod 0555 \"\(pluginPath)\""
+hidden pluginInitCommand: String = pluginDownloadCommand + " && " + pluginChecksumCommand + " && " + pluginPrepareCommand
+
 
 hidden agentSettings: Agent = new {
   trustDomain = outer.trustDomain
@@ -41,7 +49,7 @@ hidden serverCompose = new Dynamic {
       restart = "no"
       command = new Listing {
         "sh"; "-c";
-        pluginDownloadCommand
+        pluginInitCommand
       }
       volumes = new Listing { new Dynamic { type = "volume"; source = "spire-plugin"; target = "/plugin" } }
     } else null
