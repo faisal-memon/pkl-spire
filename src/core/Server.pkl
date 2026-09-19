@@ -25,6 +25,3 @@ class CustomBundlePublisher {
   downloadUrl: String(!isEmpty, !contains("\n"), !contains("$"))
   downloadChecksum: String? = null
 }
-
-/// Optional custom BundlePublisher loaded by the SPIRE server.
-customBundlePublisher: CustomBundlePublisher? = null
