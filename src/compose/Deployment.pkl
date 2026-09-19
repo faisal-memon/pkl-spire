@@ -33,8 +33,9 @@ hidden pluginChecksumCommand: String = if (serverSettings.customBundlePublisher 
   "echo \"\(serverSettings.customBundlePublisher.downloadChecksum)  \(pluginPath)\" | sha256sum -c -"
 else
   "true"
+hidden pluginCleanupCommand: String = "rm -f \"\(pluginPath)\""
 hidden pluginPrepareCommand: String = "chmod 0555 \"\(pluginPath)\""
-hidden pluginInitCommand: String = pluginDownloadCommand + " && " + pluginChecksumCommand + " && " + pluginPrepareCommand
+hidden pluginInitCommand: String = pluginCleanupCommand + " && " + pluginDownloadCommand + " && " + pluginChecksumCommand + " && " + pluginPrepareCommand
 
 
 hidden agentSettings: Agent = new {
