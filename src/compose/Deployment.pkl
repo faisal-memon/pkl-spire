@@ -20,10 +20,12 @@ hidden serverSettings: Server = new {
   healthChecksEnabled = true
   healthBindAddress = "0.0.0.0"
 }
-hidden pluginDownloadCommand: String = if (serverSettings.bundlePublisherDownloadChecksum != null)
-  "curl -fsSL --retry 5 --retry-all-errors \"\(serverSettings.bundlePublisherDownloadUrl)\" -o /plugin/publisher && echo \"\(serverSettings.bundlePublisherDownloadChecksum)  /plugin/publisher\" | sha256sum -c - && chmod 0555 /plugin/publisher"
+hidden pluginDownloadCommand: String = if (serverSettings.customBundlePublisher != null && serverSettings.customBundlePublisher.downloadChecksum != null)
+  "curl -fsSL --retry 5 --retry-all-errors \"\(serverSettings.customBundlePublisher.downloadUrl)\" -o /plugin/publisher && echo \"\(serverSettings.customBundlePublisher.downloadChecksum)  /plugin/publisher\" | sha256sum -c - && chmod 0555 /plugin/publisher"
+else if (serverSettings.customBundlePublisher != null)
+  "curl -fsSL --retry 5 --retry-all-errors \"\(serverSettings.customBundlePublisher.downloadUrl)\" -o /plugin/publisher && chmod 0555 /plugin/publisher"
 else
-  pluginDownloadCommand
+  ""
 
 hidden agentSettings: Agent = new {
   trustDomain = outer.trustDomain
@@ -34,7 +36,7 @@ hidden agentSettings: Agent = new {
 hidden serverCompose = new Dynamic {
   name = "spire-server"
   services {
-    plugin_init = if (serverSettings.bundlePublisherDownloadUrl != null) new Dynamic {
+    plugin_init = if (serverSettings.customBundlePublisher != null) new Dynamic {
       image = "curlimages/curl:8.10.1"
       restart = "no"
       command = new Listing {
@@ -47,7 +49,7 @@ hidden serverCompose = new Dynamic {
       image = "ghcr.io/spiffe/spire-server:\(spireVersion)"
       command = new Listing { "-config"; "/opt/spire/conf/server.conf" }
       restart = "unless-stopped"
-      depends_on = if (serverSettings.bundlePublisherDownloadUrl != null) new Dynamic {
+      depends_on = if (serverSettings.customBundlePublisher != null) new Dynamic {
         plugin_init { condition = "service_completed_successfully" }
       } else null
       volumes = new Listing {

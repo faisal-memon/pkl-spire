@@ -3,12 +3,17 @@ open module spire.core.Server
 
 import "Common.pkl"
 
-/// Optional custom BundlePublisher executable mounted into the SPIRE server.
-bundlePublisherCommand: String? = null
-bundlePublisherChecksum: String? = null
-bundlePublisherDirectory: Common.AbsolutePath = "/var/lib/spire/bundles"
-bundlePublisherDownloadUrl: String? = null
-bundlePublisherDownloadChecksum: String? = null
+/// Configuration for an externally built SPIRE BundlePublisher plugin.
+class CustomBundlePublisher {
+  command: String(!isEmpty, !contains("\n"), !contains("$"))
+  checksum: String? = null
+  directory: Common.AbsolutePath = "/var/lib/spire/bundles"
+  downloadUrl: String(!isEmpty, !contains("\n"), !contains("$"))
+  downloadChecksum: String? = null
+}
+
+/// Optional custom BundlePublisher loaded by the SPIRE server.
+customBundlePublisher: CustomBundlePublisher? = null
 
 trustDomain: Common.TrustDomain
 port: Common.Port = 8081
