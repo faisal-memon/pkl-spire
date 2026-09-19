@@ -48,6 +48,7 @@ hidden serverCompose = new Dynamic {
   services {
     plugin_init = if (serverSettings.customBundlePublisher != null) new Dynamic {
       image = "curlimages/curl:8.10.1"
+      user = "0:0"
       restart = "no"
       command = new Listing {
         "sh"; "-c";
