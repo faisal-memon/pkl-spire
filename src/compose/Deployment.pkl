@@ -66,7 +66,7 @@ hidden serverCompose = new Dynamic {
       } else null
       volumes = new Listing {
         new Dynamic { type = "bind"; source = hostRoot + "/server"; target = serverSettings.dataDir; bind { create_host_path = false } }
-        new Dynamic { type = "bind"; source = hostRoot + "/bundles"; target = serverSettings.customBundlePublisher?.directory ?? "/var/lib/spire/bundles"; bind { create_host_path = false } }
+        new Dynamic { type = "bind"; source = hostRoot + "/bundles"; target = "/var/lib/spire/bundles"; bind { create_host_path = false } }
         new Dynamic { type = "bind"; source = "./server.conf"; target = "/opt/spire/conf/server.conf"; read_only = true; bind { create_host_path = false } }
         new Dynamic { type = "volume"; source = "spire-plugin"; target = "/opt/spire/plugins"; read_only = true }
       }
