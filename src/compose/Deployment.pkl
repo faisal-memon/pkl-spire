@@ -20,6 +20,21 @@ hidden serverSettings: Server = new {
   healthChecksEnabled = true
   healthBindAddress = "0.0.0.0"
 }
+hidden pluginPath: String = "/plugin/publisher"
+hidden pluginDownloadCommand: String = if (serverSettings.customBundlePublisher != null)
+  "curl -fsSL --retry 5 --retry-all-errors"
+  + " \"\(serverSettings.customBundlePublisher.downloadUrl)\""
+  + " -o \"\(pluginPath)\""
+else
+  ""
+hidden pluginChecksumCommand: String = if (serverSettings.customBundlePublisher != null && serverSettings.customBundlePublisher.downloadChecksum != null)
+  "echo \"\(serverSettings.customBundlePublisher.downloadChecksum)  \(pluginPath)\" | sha256sum -c -"
+else
+  "true"
+hidden pluginPrepareCommand: String = "chmod 0555 \"\(pluginPath)\""
+hidden pluginInitCommand: String = pluginDownloadCommand + " && " + pluginChecksumCommand + " && " + pluginPrepareCommand
+
+
 hidden agentSettings: Agent = new {
   trustDomain = outer.trustDomain
   serverAddress = outer.serverAddress
@@ -29,19 +44,35 @@ hidden agentSettings: Agent = new {
 hidden serverCompose = new Dynamic {
   name = "spire-server"
   services {
+    plugin_init = if (serverSettings.customBundlePublisher != null) new Dynamic {
+      image = "curlimages/curl:8.10.1"
+      restart = "no"
+      command = new Listing {
+        "sh"; "-c";
+        pluginInitCommand
+      }
+      volumes = new Listing { new Dynamic { type = "volume"; source = "spire-plugin"; target = "/plugin" } }
+    } else null
     server {
       image = "ghcr.io/spiffe/spire-server:\(spireVersion)"
       command = new Listing { "-config"; "/opt/spire/conf/server.conf" }
       restart = "unless-stopped"
+      depends_on = if (serverSettings.customBundlePublisher != null) new Dynamic {
+        plugin_init { condition = "service_completed_successfully" }
+      } else null
       volumes = new Listing {
         new Dynamic { type = "bind"; source = hostRoot + "/server"; target = serverSettings.dataDir; bind { create_host_path = false } }
         new Dynamic { type = "bind"; source = "./server.conf"; target = "/opt/spire/conf/server.conf"; read_only = true; bind { create_host_path = false } }
+        new Dynamic { type = "volume"; source = "spire-plugin"; target = "/opt/spire/plugins"; read_only = true }
       }
       ports = new Listing {
         new Dynamic { target = serverPort; published = serverPort; protocol = "tcp" }
         new Dynamic { target = serverSettings.healthPort; published = serverSettings.healthPort; host_ip = "127.0.0.1"; protocol = "tcp" }
       }
     }
+  }
+  volumes {
+    ["spire-plugin"] {}
   }
 }
 

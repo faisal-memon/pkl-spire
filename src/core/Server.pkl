@@ -13,3 +13,15 @@ readyPath: String(!isEmpty, !contains("\n"), !contains("$")) = "/ready"
 dataDir: Common.AbsolutePath = "/var/lib/spire/server"
 socketPath: Common.AbsolutePath = "/tmp/spire-server/private/api.sock"
 logLevel: Common.LogLevel = "INFO"
+
+/// Optional custom BundlePublisher loaded by the SPIRE server.
+customBundlePublisher: CustomBundlePublisher? = null
+
+/// Configuration for an externally built SPIRE BundlePublisher plugin.
+class CustomBundlePublisher {
+  command: String(!isEmpty, !contains("\n"), !contains("$"))
+  checksum: String? = null
+  directory: Common.AbsolutePath = "/var/lib/spire/bundles"
+  downloadUrl: String(!isEmpty, !contains("\n"), !contains("$"))
+  downloadChecksum: String? = null
+}
