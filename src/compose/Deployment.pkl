@@ -10,7 +10,8 @@ import "../render/AgentConfig.pkl"
 /// Example-only default; production deployments should override this value.
 trustDomain: Common.TrustDomain = "example.org"
 serverAddress: String(!isEmpty, !contains("\n"), !contains("$"))
-spireVersion: String(matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+")))
+/// SPIRE image version; Renovate updates this default as new releases arrive.
+spireVersion: String(matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+"))) = "1.15.3"
 serverPort: Common.Port = 8081
 hostRoot: Common.AbsolutePath = "/var/lib/spire"
 diskBundlePublisher: Server.DiskBundlePublisher? = null

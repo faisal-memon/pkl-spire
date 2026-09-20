@@ -1,0 +1,14 @@
+{
+  "extends": ["config:recommended"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^src\\/compose\\/Deployment\\.pkl$/"],
+      "matchStrings": [
+        "spireVersion: String\\(matches\\(Regex\\(\\\"[^\\\"]+\\\"\\)\\)\\) = \\\"(?<currentValue>[^\\\"]+)\\\""
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "ghcr.io/spiffe/spire-server"
+    }
+  ]
+}
