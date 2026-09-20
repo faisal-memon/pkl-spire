@@ -11,7 +11,7 @@ import "../render/AgentConfig.pkl"
 trustDomain: Common.TrustDomain = "example.org"
 serverAddress: String(!isEmpty, !contains("\n"), !contains("$"))
 /// SPIRE image version; Renovate updates this default as new releases arrive.
-spireVersion: String(matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+"))) = "1.15.3"
+version: String(matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+"))) = "1.15.3"
 serverPort: Common.Port = 8081
 hostRoot: Common.AbsolutePath = "/var/lib/spire"
 diskBundlePublisher: Server.DiskBundlePublisher? = null
@@ -59,7 +59,7 @@ hidden serverCompose = new Dynamic {
       volumes = new Listing { new Dynamic { type = "volume"; source = "spire-plugin"; target = "/plugin" } }
     } else null
     server {
-      image = "ghcr.io/spiffe/spire-server:\(spireVersion)"
+      image = "ghcr.io/spiffe/spire-server:\(version)"
       command = new Listing { "-config"; "/opt/spire/conf/server.conf" }
       restart = "unless-stopped"
       depends_on = if (serverSettings.diskBundlePublisher != null) new Dynamic {
@@ -90,7 +90,7 @@ hidden agentCompose = new Dynamic {
   name = "spire-agent"
   services {
     agent {
-      image = "ghcr.io/spiffe/spire-agent:\(spireVersion)"
+      image = "ghcr.io/spiffe/spire-agent:\(version)"
       command = new Listing { "-config"; "/opt/spire/conf/agent.conf" }
       user = "0:0"
       pid = "host"

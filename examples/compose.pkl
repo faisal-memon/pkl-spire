@@ -3,4 +3,4 @@ amends "../src/compose/Deployment.pkl"
 
 trustDomain = "example.org"
 serverAddress = "192.0.2.10"
-spireVersion = "1.15.3"
+version = "1.15.3"

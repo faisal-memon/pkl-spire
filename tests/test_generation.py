@@ -70,7 +70,7 @@ class GenerationTests(unittest.TestCase):
     def test_bad_inputs_fail_generation(self):
         for override in ('serverPort = 0', 'serverPort = 65536', 'trustDomain = "spiffe://example.org"',
                          'hostRoot = "relative"', 'hostRoot = "/srv/$HOME"',
-                         'spireVersion = "latest"'):
+                         'version = "latest"'):
             with self.subTest(override=override):
                 result, _ = self.evaluate(override)
                 self.assertNotEqual(result.returncode, 0)
