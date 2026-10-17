@@ -99,8 +99,8 @@ hidden agentCompose = new Dynamic {
       restart = "unless-stopped"
       volumes = new Listing {
         new Dynamic { type = "bind"; source = "./agent.conf"; target = "/opt/spire/conf/agent.conf"; read_only = true; bind { create_host_path = false } }
-        new Dynamic { type = "bind"; source = hostRoot + "/agent"; target = agentSettings.dataDir; bind { create_host_path = false } }
-        new Dynamic { type = "bind"; source = hostRoot + "/sockets"; target = "/opt/spire/sockets/agent"; bind { create_host_path = false } }
+        new Dynamic { type = "bind"; source = hostRoot + "/agent"; target = agentSettings.dataDir; bind { create_host_path = true } }
+        new Dynamic { type = "bind"; source = hostRoot + "/sockets"; target = "/opt/spire/sockets/agent"; bind { create_host_path = true } }
         new Dynamic { type = "bind"; source = bootstrapRoot; target = "/opt/spire/bootstrap"; read_only = true; bind { create_host_path = false } }
         new Dynamic { type = "bind"; source = "/var/run/docker.sock"; target = "/var/run/docker.sock"; read_only = true; bind { create_host_path = false } }
       }
