@@ -14,6 +14,8 @@ serverAddress: String(!isEmpty, !contains("\n"), !contains("$"))
 version: String(matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+"))) = "1.15.3"
 serverPort: Common.Port = 8081
 hostRoot: Common.AbsolutePath = "/var/lib/spire"
+/// Host directory containing the SPIRE bootstrap bundle.
+bootstrapRoot: Common.AbsolutePath = hostRoot + "/bootstrap"
 diskBundlePublisher: Server.DiskBundlePublisher? = null
 
 hidden serverSettings: Server = new {
@@ -99,7 +101,7 @@ hidden agentCompose = new Dynamic {
         new Dynamic { type = "bind"; source = "./agent.conf"; target = "/opt/spire/conf/agent.conf"; read_only = true; bind { create_host_path = false } }
         new Dynamic { type = "bind"; source = hostRoot + "/agent"; target = agentSettings.dataDir; bind { create_host_path = false } }
         new Dynamic { type = "bind"; source = hostRoot + "/sockets"; target = "/opt/spire/sockets/agent"; bind { create_host_path = false } }
-        new Dynamic { type = "bind"; source = hostRoot + "/bootstrap"; target = "/opt/spire/bootstrap"; read_only = true; bind { create_host_path = false } }
+        new Dynamic { type = "bind"; source = bootstrapRoot; target = "/opt/spire/bootstrap"; read_only = true; bind { create_host_path = false } }
         new Dynamic { type = "bind"; source = "/var/run/docker.sock"; target = "/var/run/docker.sock"; read_only = true; bind { create_host_path = false } }
       }
     }
