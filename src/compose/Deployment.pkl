@@ -11,7 +11,7 @@ import "../render/AgentConfig.pkl"
 trustDomain: Common.TrustDomain = "example.org"
 serverAddress: String(!isEmpty, !contains("\n"), !contains("$"))
 /// SPIRE image version; Renovate updates this default as new releases arrive.
-version: String(matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+"))) = "1.15.3"
+version: String(matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+"))) = "1.15.4"
 serverPort: Common.Port = 8081
 hostRoot: Common.AbsolutePath = "/var/lib/spire"
 /// Host directory containing the SPIRE bootstrap bundle.
