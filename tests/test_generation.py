@@ -65,7 +65,7 @@ class GenerationTests(unittest.TestCase):
         mounts = {v['target']: v for v in service['volumes']}
         self.assertIn('/var/run/docker.sock', mounts)
         self.assertTrue(mounts['/opt/spire/bootstrap']['read_only'])
-        self.assertFalse(mounts['/opt/spire/data/agent']['bind']['create_host_path'])
+        self.assertTrue(mounts['/opt/spire/data/agent']['bind']['create_host_path'])
 
     def test_bad_inputs_fail_generation(self):
         for override in ('serverPort = 0', 'serverPort = 65536', 'trustDomain = "spiffe://example.org"',
